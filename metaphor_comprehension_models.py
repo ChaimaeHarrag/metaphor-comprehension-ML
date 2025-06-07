@@ -14,36 +14,37 @@ from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, mean_absolute_error
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-import mord
 
-# Set random seed for reproducibility
+try:
+    import mord
+except ImportError:
+    raise ImportError("Please install the 'mord' package using pip install mord before running this script.")
+
+# Set random seed
 np.random.seed(42)
 
-# 📂 2. Load and preprocess dataset
+# 📂 2. Load and preprocess data
 df = pd.read_csv("metaphor_comprehension.csv")
 
-# Ensure required columns exist
+# Validate structure
 required_cols = ['Age', 'FluidIntelligence', 'ComplexSpanScore', 'MetaphorComprehension']
 if not all(col in df.columns for col in required_cols):
-    raise ValueError(f"Dataset must contain columns: {required_cols}")
+    raise ValueError(f"Dataset must contain the columns: {required_cols}")
 
-# Validate comprehension scores
+# Ensure MetaphorComprehension is ordinal (1–4)
 if not df['MetaphorComprehension'].isin([1, 2, 3, 4]).all():
-    raise ValueError("MetaphorComprehension must be in range 1–4")
+    raise ValueError("MetaphorComprehension values must be in the range 1–4")
 
-# Adjust labels to 0–3
-df['MetaphorComprehension'] = df['MetaphorComprehension'] - 1
-
-# Drop missing data
+df['MetaphorComprehension'] -= 1  # Shift to 0–3
 df = df.dropna()
 
-# Standardize predictors
+# Scale predictors
 scaler = StandardScaler()
 df[['Age', 'FluidIntelligence', 'ComplexSpanScore']] = scaler.fit_transform(
     df[['Age', 'FluidIntelligence', 'ComplexSpanScore']]
 )
 
-# 🔧 3. Prepare data
+# 🔧 3. Train-test split
 X = df[['Age', 'FluidIntelligence', 'ComplexSpanScore']]
 y = df['MetaphorComprehension']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -55,10 +56,10 @@ models = {
     'GradientBoosting': GradientBoostingClassifier(n_estimators=100, random_state=42)
 }
 
-# Create output directory
+# Create output folder
 os.makedirs("outputs", exist_ok=True)
 
-# 📈 5. Train and evaluate
+# 📈 5. Train, evaluate, visualize
 results = {}
 
 for name, model in models.items():
@@ -69,7 +70,8 @@ for name, model in models.items():
     mae = mean_absolute_error(y_test, y_pred)
     report = classification_report(y_test, y_pred,
                                     target_names=['Abstract Complete', 'Abstract Partial',
-                                                  'Concrete', 'Other/Unrelated'], output_dict=True)
+                                                  'Concrete', 'Other/Unrelated'],
+                                    output_dict=True)
     cv_scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
 
     results[name] = {
@@ -80,7 +82,7 @@ for name, model in models.items():
         'CV Std': cv_scores.std()
     }
 
-    # Save confusion matrix
+    # 📌 Confusion matrix
     conf_mat = confusion_matrix(y_test, y_pred)
     plt.figure(figsize=(6, 5))
     sns.heatmap(conf_mat, annot=True, fmt='d', cmap='Blues',
@@ -93,30 +95,39 @@ for name, model in models.items():
     plt.savefig(f"outputs/confusion_matrix_{name}.png")
     plt.close()
 
-    # Save classification report
+    # 📌 Save classification report
     results[name]['Classification Report'].to_csv(f"outputs/classification_report_{name}.csv")
 
-# 🌟 6. Feature importance (for tree-based models)
+# 📉 6. Feature importance for tree-based models
 for name in ['RandomForest', 'GradientBoosting']:
     model = models[name]
     importances = model.feature_importances_
     feature_names = ['Age', 'FluidIntelligence', 'ComplexSpanScore']
 
-    plt.bar(feature_names, importances)
+    plt.figure(figsize=(6, 4))
+    sns.barplot(x=importances, y=feature_names, palette='viridis')
     plt.title(f"Feature Importance - {name}")
-    plt.xlabel("Features")
-    plt.ylabel("Importance")
+    plt.xlabel("Importance")
     plt.tight_layout()
     plt.savefig(f"outputs/feature_importance_{name}.png")
     plt.close()
 
-# 📋 7. Save model summary
+# 🔬 7. Correlation matrix
+plt.figure(figsize=(6, 5))
+sns.heatmap(df[['Age', 'FluidIntelligence', 'ComplexSpanScore']].corr(),
+            annot=True, cmap='coolwarm', vmin=-1, vmax=1)
+plt.title("Correlation Matrix")
+plt.tight_layout()
+plt.savefig("outputs/correlation_matrix.png")
+plt.close()
+
+# 🧾 8. Save model comparison summary
 summary = pd.DataFrame({
-    'Model': [name for name in results],
-    'Accuracy': [results[name]['Accuracy'] for name in results],
-    'MAE': [results[name]['MAE'] for name in results],
-    'CV Mean Accuracy': [results[name]['CV Mean Accuracy'] for name in results],
-    'CV Std': [results[name]['CV Std'] for name in results]
+    'Model': list(results.keys()),
+    'Accuracy': [results[m]['Accuracy'] for m in results],
+    'MAE': [results[m]['MAE'] for m in results],
+    'CV Mean Accuracy': [results[m]['CV Mean Accuracy'] for m in results],
+    'CV Std': [results[m]['CV Std'] for m in results]
 })
 summary.to_csv("outputs/model_comparison.csv", index=False)
 print("\nModel Comparison Summary:\n", summary)
