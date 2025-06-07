@@ -1,56 +1,81 @@
 # 🧠 Metaphor Comprehension ML Models
 
-This project compares three machine learning models—Ordinal Logistic Regression (`mord`), Random Forest, and Gradient Boosting—to predict metaphor comprehension based on cognitive variables such as age, fluid intelligence, and working memory.
+This project compares three machine learning models—Ordinal Logistic Regression (`mord`), Random Forest, and Gradient Boosting—to predict metaphor comprehension based on cognitive variables such as age, fluid intelligence, and working memory. It demonstrates how interpretable ML models can capture individual differences in figurative language understanding.
+
+---
 
 ## 🔍 Objective
 
-To explore how individual differences in cognitive function influence figurative language processing using robust, interpretable machine learning models.
+To investigate how cognitive factors predict metaphor comprehension using robust, interpretable machine learning techniques, with implications for cognitive aging and educational psycholinguistics.
+
+---
 
 ## 💡 Why This Matters
 
-Figurative language, especially metaphor, taps into complex neurocognitive processes. This project contributes to the understanding of how cognitive aging and executive function shape metaphor comprehension. The work models these processes computationally, laying the groundwork for neurocognitive integration through EEG/fMRI—relevant to research in psycholinguistics, aging, and educational neuroscience.
+Figurative language, particularly metaphor, engages intricate neurocognitive mechanisms, drawing on higher-order reasoning abilities, memory, and executive control. This project advances our understanding of how individual differences in cognitive aging and executive function influence metaphor comprehension. Modeling these processes computationally lays a scalable foundation for future integration with EEG and fMRI data, offering valuable insights for psycholinguistics, cognitive aging research, and neuroscience.
+---
 
-## 🛠 Methods
+## 🛠 Methods Overview
 
-- **Models Used**:  
-  - `mord.LogisticIT` (Ordinal Logistic Regression)  
-  - `RandomForestClassifier`  
-  - `GradientBoostingClassifier`
+### Models Trained
+- `mord.LogisticIT` (Ordinal Logistic Regression)  
+- `RandomForestClassifier`  
+- `GradientBoostingClassifier`  
 
-- **Evaluation Metrics**:  
-  Accuracy, Mean Absolute Error (MAE), Confusion Matrix, Cross-Validation
+### Evaluation
+- Accuracy, Mean Absolute Error (MAE)  
+- 5-fold Cross-Validation  
+- Confusion Matrices  
+- Feature Importances and Coefficients
 
-- **Feature Engineering**:  
-  Standardization, Label Encoding
+### Preprocessing
+- Standardization with `StandardScaler`  
+- Label normalization (ordinal transformation)
 
-- **Visualization Tools**:  
-  Seaborn heatmaps, Matplotlib bar plots (for feature importance)
+### Tools & Libraries
+- `scikit-learn`, `mord`, `pandas`, `numpy`, `seaborn`, `matplotlib`
 
-## 📁 File Structure
+---
 
-- `metaphor_comprehension_models.py` – full implementation in Python
-- `outputs/` – saved figures, model summaries, and classification reports
-- `model_comparison.csv` – final summary table comparing model performance
+## 📁 Repository Contents
 
-## 💬 Sample Results
+- `metaphor_comprehension_models.py` – full implementation and analysis pipeline
+- `outputs/` – saved output files from model training and evaluation, including:
+  - Confusion matrices (`confusion_matrix_*.png`)
+  - Feature importance plots (`feature_importance_*.png`)
+  - Logistic regression coefficients (`logistic_coefficients.png`)
+  - Correlation matrix (`correlation_matrix.png`)
+  - Classification reports (`classification_report_*.csv`)
+  - Model comparison summary (`model_comparison.csv`)
+- `outputs_ml_comparison.zip` – downloadable archive of all outputs
 
-| Model            | Accuracy | MAE  | CV Mean Accuracy |
+---
+
+## 📊 Sample Output Snapshot
+
+| Model             | Accuracy | MAE  | CV Mean Accuracy |
 |------------------|----------|------|------------------|
-| LogisticIT       | 0.78     | 0.41 | 0.76             |
-| Random Forest    | 0.83     | 0.35 | 0.82             |
-| Gradient Boosting| 0.85     | 0.33 | 0.84             |
+| LogisticIT        | —        | —    | —                |
+| Random Forest     | —        | —    | —                |
+| Gradient Boosting | —        | —    | —                |
 
-## 🧪 Tools & Libraries
+> *Run the script to generate your own results. Output metrics are automatically saved.*
 
-`scikit-learn`, `mord`, `pandas`, `numpy`, `seaborn`, `matplotlib`
+---
+
+## 📦 Data Access
+
+The dataset (`metaphor_comprehension.csv`) is not included in the repository due to privacy.  
+📧 *Data is available upon request.*
+
+---
 
 ## 👩‍🔬 Author
 
 **Chaimae Harrag**  
-PhD Candidate in Cognitive Science & Psycholinguistics  
-Researching language comprehension, memory, and aging using machine learning and discourse analytics.  
-Project developed in the context of applying for the [Ibn Sina Neurotech Autumn School (IBRO, 2025)](https://arabsinneuro.org) to bridge behavioral modeling with neuroimaging.
+PhD Candidate in Language and Cognition
+Fulbright and Erasmus Scholar | Researcher in language, Cognition, and Machine Learning 
 
-## 📦 Data Access
 
-The dataset (`metaphor_comprehension.csv`) is available upon request.
+---
+
